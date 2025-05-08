@@ -1,0 +1,30 @@
+# Build artifacts
+/build/
+
+# IDE files
+.vscode/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Binaries
+*.o
+*.obj
+*.exe
+
+# Logs
+*.log
+
+# Python cache
+__pycache__/
+
+# vcpkg build artifacts
+/vcpkg/buildtrees/
+/vcpkg/packages/
+/vcpkg/installed/
+/vcpkg/downloads/
+*.zip
+*.nupkg
