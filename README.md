@@ -5,6 +5,7 @@ Repo
 ## Project Overview
 
 -**Phase 1**: High-performance C++23 LOB Simulator
+
 -**Phase 2**: 3D dashboards for order-book and volatility surfaces
 
 ## Prerequisites
