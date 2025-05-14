@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -16,7 +17,14 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build libarrow-dev libparquet-dev
+          sudo apt-get install -y cmake ninja-build g++ libgtest-dev
+
+      - name: Prepare GoogleTest
+        run: |
+          # libgtest-dev only installs sources; build and install the library:
+          cd /usr/src/gtest
+          cmake CMakeLists.txt
+          sudo make && sudo cp *.a /usr/lib
 
       - name: Configure
         run: cmake -S . -B build -G Ninja
