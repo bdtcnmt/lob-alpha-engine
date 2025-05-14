@@ -1,24 +1,32 @@
 name: CI
 
 on:
-  push:        { branches: [ main ] }
-  pull_request:{ branches: [ main ] }
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          submodules: 'recursive'    # <— make sure we pull in extern/googletest
+          submodules: 'recursive'
 
       - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build g++
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++
 
-      - name: Configure & build
-        run: cmake -S . -B build -G Ninja && cmake --build build
+      - name: Configure
+        run: cmake -S . -B build -G Ninja
+
+      - name: Build
+        run: cmake --build build
 
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
-        
