@@ -17,13 +17,33 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Install build tools
+      - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++
+          sudo apt-get install -y \
+            git \
+            cmake \
+            ninja-build \
+            g++ \
+            zip \
+            unzip \
+            pkg-config \
+            libssl-dev \
+            liblz4-dev \
+            libsnappy-dev
 
-      - name: Configure
-        run: cmake -S . -B build -G Ninja
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git vcpkg
+          ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+      - name: Install Arrow via vcpkg
+        run: |
+          ./vcpkg/vcpkg install arrow[parquet]:x64-linux
+
+      - name: Configure with vcpkg toolchain
+        run: cmake -S . -B build -G Ninja \
+              -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         run: cmake --build build
