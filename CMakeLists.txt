@@ -9,46 +9,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ————————————————————————————————
-# 2. Dependencies
+# 2. Fetch GoogleTest via FetchContent
 # ————————————————————————————————
-# GoogleTest for unit tests
-find_package(GTest CONFIG REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL  https://github.com/google/googletest/archive/release-1.17.0.zip
+)
+# For Windows: prevent overriding our compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
-# Apache Arrow (installed from AUR: arrow-cpp, parquet-cpp)
+# ————————————————————————————————
+# 3. Arrow (AUR) and other dependencies
+# ————————————————————————————————
 find_package(Arrow CONFIG REQUIRED)
 
 # ————————————————————————————————
-# 3. Targets
+# 4. Targets
 # ————————————————————————————————
-# 3.1 Hello LOB demo
-add_executable(hello_lob
-  src/main.cpp
-)
+add_executable(hello_lob src/main.cpp)
 
-# 3.2 Dummy test target
 enable_testing()
-add_executable(test_dummy
-  tests/test_dummy.cpp
-)
-target_link_libraries(test_dummy
-  PRIVATE
-    GTest::gtest_main
-)
-add_test(
-  NAME DummyTest
-  COMMAND test_dummy
-)
+add_executable(test_dummy tests/test_dummy.cpp)
+target_link_libraries(test_dummy PRIVATE gtest_main)
+add_test(NAME DummyTest COMMAND test_dummy)
 
-# ————————————————————————————————
-# 4. Future modules
-# ————————————————————————————————
-# Later you can split into subdirectories:
-# add_subdirectory(src/engine_core)
-# add_subdirectory(src/data_pipeline)
-# add_subdirectory(tests)
-
-# ————————————————————————————————
-# 5. Configure test output
-# ————————————————————————————————
-# Show full output on test failure
 set(CTEST_OUTPUT_ON_FAILURE ON)

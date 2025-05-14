@@ -15,22 +15,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ libgtest-dev
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build g++
 
-      - name: Prepare GoogleTest
-        run: |
-          # libgtest-dev only installs sources; build and install the library:
-          cd /usr/src/gtest
-          cmake CMakeLists.txt
-          sudo make && sudo cp *.a /usr/lib
-
-      - name: Configure
-        run: cmake -S . -B build -G Ninja
-
-      - name: Build
-        run: cmake --build build
+      - name: Configure & build
+        run: cmake -S . -B build -G Ninja && cmake --build build
 
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
