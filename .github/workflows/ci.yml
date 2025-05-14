@@ -17,6 +17,16 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            vcpkg/installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/vcpkg
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg/manifest.json') }}
+
       - name: Install system packages
         run: |
           sudo apt-get update
@@ -42,8 +52,7 @@ jobs:
           ./vcpkg/vcpkg install arrow[parquet]:x64-linux
 
       - name: Configure with vcpkg toolchain
-        run: cmake -S . -B build -G Ninja \
-              -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         run: cmake --build build
