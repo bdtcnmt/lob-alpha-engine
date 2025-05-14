@@ -1,48 +1,68 @@
 cmake_minimum_required(VERSION 3.20)
+project(lob_alpha_engine LANGUAGES CXX)
 
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE
-      "C:/Users/Landorus/Desktop/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      CACHE STRING "Vcpkg toolchain file")
-endif()
-
-project(lob_alpha_engine
-    VERSION 0.1.0
-    LANGUAGES CXX
-)
-
+# ————————————————————————————————
+# 1. C++ standard and toolchain
+# ————————————————————————————————
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+# If you’re using vcpkg for deps, point CMake to its toolchain file
+if(EXISTS "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  set(CMAKE_TOOLCHAIN_FILE
+      "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "Vcpkg toolchain file")
+endif()
 
-file(GLOB_RECURSE LOB_SOURCES
-    "${PROJECT_SOURCE_DIR}/src/*.cpp"
-)
-
-add_executable(${PROJECT_NAME}
-    ${LOB_SOURCES}
-)
-
-# C++ arrow
-find_package(Arrow REQUIRED)
+# ————————————————————————————————
+# 2. Find dependencies
+# ————————————————————————————————
 # GoogleTest for unit tests
-find_package(GTest REQUIRED)
-# pybind11 for Python bindings
-find_package(pybind11 REQUIRED)
-# fmt for string formatting
-find_package(fmt REQUIRED)
-# spdlog for logging
-find_package(spdlog REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
-# Link libs to main executable (add more as you need them)
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Arrow::arrow
-    fmt::fmt
-    spdlog::spdlog
+# (Optional) Apache Arrow if you’ll start on parquet/io in Week 2
+# find_package(Arrow CONFIG REQUIRED)
+
+# ————————————————————————————————
+# 3. Declare targets
+# ————————————————————————————————
+# 3.1 Hello LOB demo
+add_executable(hello_lob
+  src/main.cpp
+)
+# (No extra libs for hello_lob)
+
+# 3.2 Dummy test target
+enable_testing()
+add_executable(test_dummy
+  tests/test_dummy.cpp
+)
+target_link_libraries(test_dummy
+  PRIVATE
+    GTest::gtest_main
+)
+add_test(
+  NAME DummyTest
+  COMMAND test_dummy
 )
 
-# Enable testing and include the tests directory
-enable_testing()
-add_subdirectory(tests)
+# ————————————————————————————————
+# 4. (Future) include subdirectories
+# ————————————————————————————————
+# Later you can split into src/engine_core, src/data_pipeline, etc:
+# add_subdirectory(src/engine_core)
+# add_subdirectory(src/data_pipeline)
+# add_subdirectory(tests)
+
+# ————————————————————————————————
+# 5. Installation rules (optional)
+# ————————————————————————————————
+# install(TARGETS hello_lob test_dummy
+#         RUNTIME DESTINATION bin)
+
+# ————————————————————————————————
+# 6. Configure testing output
+# ————————————————————————————————
+# Make sure tests run verbose
+set(CTEST_OUTPUT_ON_FAILURE ON)

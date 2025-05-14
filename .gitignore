@@ -28,3 +28,6 @@ __pycache__/
 /vcpkg/downloads/
 *.zip
 *.nupkg
+
+*.user
+*.swp
